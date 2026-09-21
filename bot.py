@@ -32,7 +32,7 @@ if not BOT_TOKEN:
 # Тульское / московское время
 TIMEZONE = ZoneInfo("Europe/Moscow")
 
-DATABASE = os.getenv("DATABASE_PATH", "energy.db")
+DATABASE = "energy.db"
 
 # Напоминания:
 # 09:00, 10:00, ..., 23:00 и 00:00
