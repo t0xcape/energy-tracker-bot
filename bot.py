@@ -16,8 +16,6 @@ from telegram.ext import (
     ContextTypes,
 )
 import threading
-from flask import Flask
-import threading
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
