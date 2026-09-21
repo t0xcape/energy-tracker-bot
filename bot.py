@@ -15,6 +15,10 @@ from telegram.ext import (
     CallbackQueryHandler,
     ContextTypes,
 )
+import threading
+from flask import Flask
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 # ============================================================
@@ -38,6 +42,21 @@ DATABASE = "energy.db"
 # 09:00, 10:00, ..., 23:00 и 00:00
 REMINDER_HOURS = list(range(9, 24)) + [0]
 
+web_app = Flask(__name__)
+
+
+@web_app.route("/")
+def home():
+    return "Energy Tracker is running ⚡", 200
+
+
+def run_web_server():
+    port = int(os.environ.get("PORT", 10000))
+
+    web_app.run(
+        host="0.0.0.0",
+        port=port
+    )
 
 # ============================================================
 # БАЗА ДАННЫХ
@@ -739,6 +758,36 @@ def setup_jobs(application):
             f"{hour:02d}:00"
         )
 
+# ============================================================
+# WEB-СЕРВЕР ДЛЯ RENDER
+# ============================================================
+
+class HealthHandler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain; charset=utf-8")
+        self.end_headers()
+
+        self.wfile.write(
+            "Energy Tracker is running!".encode("utf-8")
+        )
+
+    def log_message(self, format, *args):
+        return
+
+
+def run_web_server():
+    port = int(os.environ.get("PORT", 10000))
+
+    server = HTTPServer(
+        ("0.0.0.0", port),
+        HealthHandler
+    )
+
+    print(f"🌐 Web server запущен на 0.0.0.0:{port}")
+
+    server.serve_forever()
 
 # ============================================================
 # ЗАПУСК
@@ -813,6 +862,15 @@ def main():
     print("===================================")
     print()
 
+    # HTTP-сервер нужен Render Web Service
+    web_thread = threading.Thread(
+        target=run_web_server,
+        daemon=True
+    )
+
+    web_thread.start()
+
+    # Telegram-бот
     application.run_polling()
 
 
