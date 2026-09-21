@@ -40,21 +40,6 @@ DATABASE = "energy.db"
 # 09:00, 10:00, ..., 23:00 и 00:00
 REMINDER_HOURS = list(range(9, 24)) + [0]
 
-web_app = Flask(__name__)
-
-
-@web_app.route("/")
-def home():
-    return "Energy Tracker is running ⚡", 200
-
-
-def run_web_server():
-    port = int(os.environ.get("PORT", 10000))
-
-    web_app.run(
-        host="0.0.0.0",
-        port=port
-    )
 
 # ============================================================
 # БАЗА ДАННЫХ
